@@ -29,7 +29,7 @@ def generate_launch_description():
   # Pose where we want to spawn the robot
   spawn_x_val = '0.0'
   spawn_y_val = '0.0'
-  spawn_z_val = '0.0'
+  spawn_z_val = '0.18'
   spawn_yaw_val = '0.00'
  
   ############ You do not need to change anything below this line #############
@@ -42,6 +42,7 @@ def generate_launch_description():
   world_path = os.path.join(pkg_share, world_file_path)
   gazebo_models_path = os.path.join(pkg_share, gazebo_models_path)
   os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+  # os.environ['GAZEBO_MODEL_PATH'] = (os.path.join(pkg_share, 'models') + os.pathsep + os.environ.get('GAZEBO_MODEL_PATH', ''))
  
   # Launch configuration variables specific to simulation
   use_sim_time = LaunchConfiguration('use_sim_time', default='true')

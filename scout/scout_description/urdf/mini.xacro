@@ -33,20 +33,17 @@
     <!-- Base link -->
     <link name="base_link">
         <visual>
-            <origin
-                    xyz="0 0 0.0"
-                    rpy="1.57 0 -1.57" />
+            <origin xyz="0 0 0.0" rpy="1.57 0 -1.57" />
             <geometry>
                 <mesh filename="file://$(find scout_description)/meshes/scout_mini_base_link2.dae" />
+                <!-- <box size="0.4 0.05 0.4"/> -->
             </geometry>
         </visual>
         <collision>
-            <origin
-                    xyz="0 0 0"
-                    rpy="1.57 0 1.57" />
-          <geometry>
-            <mesh
-              filename="file://$(find scout_description)/meshes/scout_mini_base_link2.dae" />
+            <origin xyz="0 0 0" rpy="1.57 0 1.57" />
+            <geometry>
+                <!-- <mesh filename="file://$(find scout_description)/meshes/scout_mini_base_link2.dae" /> -->
+                <box size="0.5 0.05 0.5"/>
           </geometry>
         </collision>
     </link>
@@ -70,6 +67,86 @@
         <parent link="base_link" />
         <child link="inertial_link" />
     </joint>
+
+    <link name="box_link">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+            <mass value="5" />
+            <inertia ixx="0.054166666667" ixy="0" ixz="0"  iyy="0.075" iyz="0" izz="0.054166666667"/>
+        </inertial>
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="file://$(find scout_description)/meshes/box_link.STL" />
+                <!-- <box size="0.3 0.3 0.2"/> -->
+            </geometry>
+            <material name = "red">
+            <color rgba="1 1 1 1" />
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <box size="0.3 0.3 0.3"/>
+          </geometry>
+        </collision>
+    </link> 
+
+    <joint name="box_joint" type="fixed">
+        <origin xyz="0 0 0.055" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="box_link" />
+    </joint>
+
+    <link name="imu_link">
+    <inertial>
+        <mass value="0.01"/>
+        <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+    </inertial>
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="base_link">
+        <sensor type="gpu_ray" name="velodyne">
+            <pose>0 0 0.45 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+            <scan>
+                <horizontal>
+                <samples>1800</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415926535897931</min_angle>
+                <max_angle>3.1415926535897931</max_angle>
+                </horizontal>
+                <vertical>
+                <samples>16</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.2617993877991494</min_angle>
+                <max_angle>0.2617993877991494</max_angle>
+                </vertical>
+            </scan>
+            <range>
+                <min>0.3</min>
+                <max>100.0</max>
+                <resolution>0.01</resolution>
+            </range>
+            </ray>
+            <plugin name="gazebo_ros_ray_sensor" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+                <remapping>~/out:=/velodyne_points</remapping>
+            </ros>
+            <output_type>sensor_msgs/PointCloud2</output_type>
+            <frame_name>base_link</frame_name>
+            <min_intensity>0.0</min_intensity>
+            </plugin>
+        </sensor>
+    </gazebo>
 
     <!-- For testing, hang the robot up in the air -->
     <!-- <link name="world" />

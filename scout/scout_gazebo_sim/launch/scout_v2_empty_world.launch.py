@@ -42,6 +42,8 @@ def generate_launch_description():
   world_path = os.path.join(pkg_share, world_file_path)
   gazebo_models_path = os.path.join(pkg_share, gazebo_models_path)
   os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+  # os.environ['GAZEBO_MODEL_PATH'] = (os.path.join(pkg_share, 'models') + os.pathsep + os.environ.get('GAZEBO_MODEL_PATH', ''))
+
  
   # Launch configuration variables specific to simulation
   use_sim_time = LaunchConfiguration('use_sim_time', default='true')
