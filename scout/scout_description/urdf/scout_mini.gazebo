@@ -29,46 +29,99 @@ Reference:
         </plugin>
     </gazebo> -->
 
-    <!-- kp spring constant, kd damping constant -->
-    <gazebo>
-        <mu1 value="1.0"/>
-        <mu2 value="0.9"/>
-        <kp value="10000000.0" />
-        <kd value="1.0" />
-        <fdir1 value="1 0 0"/>
-        <minDepth value="0.001" />
-        <maxContacts value="64"/>
-    </gazebo>
-
-
-
     <gazebo reference="base_link">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
     </gazebo>
 
+    <!-- Wheel x axis is the rolling direction, z axis is the axle: high
+         traction along rolling, low friction sideways so skid-steer can turn. -->
     <gazebo reference="front_right_wheel_link">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
+    <mu1>1.0</mu1>
+    <mu2>0.1</mu2>
+    <fdir1>1 0 0</fdir1>
     </gazebo>
 
     <gazebo reference="front_left_wheel_link">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
+    <mu1>1.0</mu1>
+    <mu2>0.1</mu2>
+    <fdir1>1 0 0</fdir1>
     </gazebo>
 
     <gazebo reference="rear_left_wheel_link">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
+    <mu1>1.0</mu1>
+    <mu2>0.1</mu2>
+    <fdir1>1 0 0</fdir1>
     </gazebo>
 
     <gazebo reference="rear_right_wheel_link">
-    <mu1>0.2</mu1>
-    <mu2>0.2</mu2>
+    <mu1>1.0</mu1>
+    <mu2>0.1</mu2>
+    <fdir1>1 0 0</fdir1>
     </gazebo>
 
-   
+    <gazebo reference="rslidar">
+        <sensor type="gpu_ray" name="rslidar">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+            <scan>
+                <horizontal>
+                <samples>1800</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415926535897931</min_angle>
+                <max_angle>3.1415926535897931</max_angle>
+                </horizontal>
+                <vertical>
+                <samples>16</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.2617993877991494</min_angle>
+                <max_angle>0.2617993877991494</max_angle>
+                </vertical>
+            </scan>
+            <range>
+                <min>0.3</min>
+                <max>100.0</max>
+                <resolution>0.01</resolution>
+            </range>
+            </ray>
+            <plugin name="gazebo_ros_ray_sensor" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+                <remapping>~/out:=/rslidar_points </remapping>
+            </ros>
+            <output_type>sensor_msgs/PointCloud2</output_type>
+            <frame_name>rslidar</frame_name>
+            <min_intensity>0.0</min_intensity>
+            </plugin>
+        </sensor>
+    </gazebo>
 
+    <gazebo reference="imu_link">
+        <sensor name="imu_sensor" type="imu">
+            <always_on>true</always_on>
+            <update_rate>100</update_rate>
+            <imu>
+                <angular_velocity>
+                    <x><noise type="gaussian"><mean>0</mean><stddev>0.002</stddev></noise></x>
+                    <y><noise type="gaussian"><mean>0</mean><stddev>0.002</stddev></noise></y>
+                    <z><noise type="gaussian"><mean>0</mean><stddev>0.002</stddev></noise></z>
+                </angular_velocity>
+                <linear_acceleration>
+                    <x><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></x>
+                    <y><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></y>
+                    <z><noise type="gaussian"><mean>0</mean><stddev>0.02</stddev></noise></z>
+                </linear_acceleration>
+            </imu>
+            <plugin name="imu_plugin" filename="libgazebo_ros_imu_sensor.so">
+                <ros>
+                    <remapping>~/out:=/imu/data</remapping>
+                </ros>
+                <initial_orientation_as_reference>false</initial_orientation_as_reference>
+                <frame_name>imu_link</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
 
 
 
@@ -145,14 +198,24 @@ Reference:
 
 
 
+          <!-- <wheel_separation>0.4165</wheel_separation> -->
+          <!-- <wheel_separation>0.4165</wheel_separation> -->
+          <!-- One entry per wheel pair: pairs without an entry silently fall
+               back to the plugin defaults (0.34 m / 0.15 m). Effective track is
+               calibrated, not the 0.5005 m cylinder-center distance: with 0.5
+               the robot over-rotates ~18%; 0.4165 is within ~4% of the measured
+               0.42-0.44 m contact track. -->
           <wheel_separation>0.4165</wheel_separation>
           <wheel_separation>0.4165</wheel_separation>
+
 
           <wheel_diameter>0.16</wheel_diameter>
           <wheel_diameter>0.16</wheel_diameter>
 
 
-          <max_wheel_torque>1000</max_wheel_torque>
+          <max_wheel_torque>20</max_wheel_torque>
+          <!-- m/s^2 of wheel surface speed, not rad/s^2: 1.0 -> 1.0 m/s^2
+               linear, ~4.8 rad/s^2 yaw (2*a/track). -->
           <max_wheel_acceleration>1.0</max_wheel_acceleration>
           <publish_odom>true</publish_odom>
           <publish_odom_tf>false</publish_odom_tf>

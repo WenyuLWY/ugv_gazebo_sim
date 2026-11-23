@@ -56,9 +56,10 @@
 
     <link name="inertial_link">
         <inertial>
-            <mass value="60" />
+            <mass value="15" />
             <origin xyz="0.0 0.0 0.0" />
-            <inertia ixx="2.288641" ixy="0" ixz="0" iyy="5.103976" iyz="0" izz="3.431465" />
+            <!-- <inertia ixx="2.288641" ixy="0" ixz="0" iyy="5.103976" iyz="0" izz="3.431465" /> -->
+            <inertia ixx="0.572" ixy="0" ixz="0" iyy="1.276" iyz="0" izz="0.858" />
         </inertial>
     </link>
 
@@ -111,42 +112,20 @@
     <origin xyz="0 0 0.05" rpy="0 0 0"/>
     </joint>
 
-    <gazebo reference="base_link">
-        <sensor type="gpu_ray" name="velodyne">
-            <pose>0 0 0.45 0 0 0</pose>
-            <visualize>false</visualize>
-            <update_rate>10</update_rate>
-            <ray>
-            <scan>
-                <horizontal>
-                <samples>1800</samples>
-                <resolution>1</resolution>
-                <min_angle>-3.1415926535897931</min_angle>
-                <max_angle>3.1415926535897931</max_angle>
-                </horizontal>
-                <vertical>
-                <samples>16</samples>
-                <resolution>1</resolution>
-                <min_angle>-0.2617993877991494</min_angle>
-                <max_angle>0.2617993877991494</max_angle>
-                </vertical>
-            </scan>
-            <range>
-                <min>0.3</min>
-                <max>100.0</max>
-                <resolution>0.01</resolution>
-            </range>
-            </ray>
-            <plugin name="gazebo_ros_ray_sensor" filename="libgazebo_ros_ray_sensor.so">
-            <ros>
-                <remapping>~/out:=/velodyne_points</remapping>
-            </ros>
-            <output_type>sensor_msgs/PointCloud2</output_type>
-            <frame_name>base_link</frame_name>
-            <min_intensity>0.0</min_intensity>
-            </plugin>
-        </sensor>
-    </gazebo>
+    <link name="rslidar">
+        <inertial>
+            <mass value="0.05"/>
+            <inertia ixx="1e-4" ixy="0" ixz="0" iyy="1e-4" iyz="0" izz="1e-4"/>
+        </inertial>
+    </link>
+
+    <joint name="lidar_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="rslidar"/>
+        <origin xyz="0 0 0.45" rpy="0 0 0"/>
+    </joint>
+
+
 
     <!-- For testing, hang the robot up in the air -->
     <!-- <link name="world" />
@@ -175,13 +154,13 @@
     <!--<origin
             xyz="0 0 0"
             rpy="0 0 0" />-->
-        <origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset+0.001}" rpy="1.57 0 0" />
+        <origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="1.57 0 0" />
     </xacro:scout_mini_wheel_3>
     <xacro:scout_mini_wheel_4 wheel_prefix="rear_right">
     <!--<origin
            xyz="0 0 0"
            rpy="0 0 0" />-->
-        <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset+0.001}" rpy="1.57 0 0" />
+        <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="1.57 0 0" />
     </xacro:scout_mini_wheel_4>
 
     <!-- Additional definitions -->
